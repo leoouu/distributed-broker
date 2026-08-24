@@ -6,28 +6,6 @@ Um sistema de mensageria Pub/Sub in-memory de alta performance desenvolvido do z
 
 O sistema adota o modelo cliente-servidor com comunicação baseada em sockets TCP puros e um protocolo binário customizado de tamanho de cabeçalho fixo (Wire Protocol).
 
-      [ Producer ]                   [ Consumer ]
-           │                              │
-    (TCP)  │ OpPublish             (TCP)  │ OpPoll / OpAck
-           ▼                              ▼
-   ┌──────────────────────────────────────────────┐
-   │             BROKER ENGINE CORE               │
-   │  ┌────────────────────────────────────────┐  │
-   │  │ Binary Protocol Framer & Dispatcher    │  │
-   │  └───────────────────┬────────────────────┘  │
-   │                      ▼                       │
-   │  ┌────────────────────────────────────────┐  │
-   │  │ Granular Topic Registry (RWMutex)      │  │
-   │  │ ├─ Topic "orders"   -> [Record Log]    │  │
-   │  │ └─ Topic "telemetry"-> [Record Log]    │  │
-   │  └───────────────────┬────────────────────┘  │
-   │                      ▼                       │
-   │  ┌────────────────────────────────────────┐  │
-   │  │ Consumer Group Offset Manager          │  │
-   │  │ └─ [GroupID, Topic] -> CommittedOffset │  │
-   │  └────────────────────────────────────────┘  │
-   └──────────────────────────────────────────────┘
-
 
 🎯 Decisões Técnicas e Tradeoffs de Engenharia
 
@@ -101,27 +79,6 @@ Cada frame TCP trafega com um cabeçalho fixo de <b>8 bytes</b> seguido pelo cor
     </tr>
   </tbody>
 </table>
-
-📂 Estrutura do Projeto
-
-distributed-broker/
-├── cmd/
-│   ├── broker/                  # Servidor TCP Daemon (main.go)
-│   └── cli/                     # Linha de comando para Publish/Poll/Ack (main.go)
-├── internal/
-│   ├── protocol/                # Framing binário, encoders e decoders de pacotes
-│   │   ├── protocol.go
-│   │   └── protocol_test.go
-│   ├── storage/                 # Engine de armazenamento in-memory, tópicos e offsets
-│   │   ├── topic.go
-│   │   ├── engine.go
-│   │   ├── engine_test.go
-│   │   └── storage_benchmark_test.go
-│   └── server/                  # Servidor TCP concorrente e connection lifecycle
-│       ├── server.go
-│       └── server_test.go
-├── go.mod
-└── README.md
 
 
 🚀 Como Executar
