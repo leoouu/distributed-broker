@@ -2,11 +2,10 @@
 
 Um sistema de mensageria Pub/Sub in-memory de alta performance desenvolvido do zero em Go, projetado para baixa latência, semântica de entrega confiável (At-Least-Once Delivery) e concorrência granular sem frameworks externos ou dependências de terceiros.
 
-## 🏛️ Arquitetura do Sistema
+🏛️ Arquitetura do Sistema
 
-O sistema adota o modelo cliente-servidor com comunicação baseada em sockets TCP puros e um protocolo binário customizado de tamanho de cabeçalho fixo (*Wire Protocol*).
+O sistema adota o modelo cliente-servidor com comunicação baseada em sockets TCP puros e um protocolo binário customizado de tamanho de cabeçalho fixo (Wire Protocol).
 
-```text
       [ Producer ]                   [ Consumer ]
            │                              │
     (TCP)  │ OpPublish             (TCP)  │ OpPoll / OpAck
@@ -42,71 +41,75 @@ Zero Overhead de Parsing: Utilização de encoding binário em ordem de rede (Bi
 
 Graceful Shutdown Defensivo: Tratamento cooperativo com context.Context e captura de sinais do SO (SIGINT/SIGTERM) para encerramento limpo do listener TCP sem abortar conexões ativas.
 
-## 📦 Wire Protocol Specification
+📦 Wire Protocol Specification
 
-Cada frame TCP trafega com um cabeçalho fixo de <b>8 bytes</b> seguido pelo corpo de tamanho variável:
+Cada frame TCP trafega com um cabeçalho fixo de 8 bytes seguido pelo corpo de tamanho variável:
 
-<pre>
 +--------+--------+---------------+------------------+---------------------+---------------------+
 | Magic  | OpCode | TopicLen(u16) | PayloadLen(u32)  | TopicName (bytes)   | Payload (bytes)     |
 | 1 byte | 1 byte | 2 bytes (BE)  | 4 bytes (BE)     | [TopicLen] bytes    | [PayloadLen] bytes  |
 +--------+--------+---------------+------------------+---------------------+---------------------+
-|&lt;------------------- HEADER FIXO (8 bytes) -----------------------------&gt;|&lt;--- CORPO VARIÁVEL -&gt;|
-</pre>
+|<------------------- HEADER FIXO (8 bytes) ----------------------------->|<--- CORPO VARIÁVEL ->|
 
-<table>
-  <thead>
-    <tr>
-      <th>Campo</th>
-      <th>Tipo</th>
-      <th>Tamanho</th>
-      <th>Descrição</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><b>Magic Byte</b></td>
-      <td><code>uint8</code></td>
-      <td>1 byte</td>
-      <td>Identificador de validação (<code>0xBF</code>) para integridade rápida</td>
-    </tr>
-    <tr>
-      <td><b>OpCode</b></td>
-      <td><code>uint8</code></td>
-      <td>1 byte</td>
-      <td>Operação (<code>0x01</code>=PUB, <code>0x03</code>=POLL, <code>0x04</code>=ACK, <code>0x05</code>=RESP, <code>0xFF</code>=ERR)</td>
-    </tr>
-    <tr>
-      <td><b>Topic Length</b></td>
-      <td><code>uint16</code></td>
-      <td>2 bytes</td>
-      <td>Comprimento do nome do tópico em bytes</td>
-    </tr>
-    <tr>
-      <td><b>Payload Length</b></td>
-      <td><code>uint32</code></td>
-      <td>4 bytes</td>
-      <td>Comprimento do corpo em bytes</td>
-    </tr>
-    <tr>
-      <td><b>Topic Name</b></td>
-      <td><code>[]byte</code></td>
-      <td>Variável</td>
-      <td>Identificador do tópico codificado em UTF-8</td>
-    </tr>
-    <tr>
-      <td><b>Payload</b></td>
-      <td><code>[]byte</code></td>
-      <td>Variável</td>
-      <td>Conteúdo da mensagem ou payload de controle</td>
-    </tr>
-  </tbody>
-</table>
 
-```markdown
-## 📂 Estrutura do Projeto
+Campo
 
-```text
+Tipo
+
+Tamanho
+
+Descrição
+
+Magic Byte
+
+uint8
+
+1 byte
+
+Identificador de validação (0xBF) para integridade rápida
+
+OpCode
+
+uint8
+
+1 byte
+
+Operação (0x01=PUB, 0x03=POLL, 0x04=ACK, 0x05=RESP, 0xFF=ERR)
+
+Topic Length
+
+uint16
+
+2 bytes
+
+Comprimento do nome do tópico em bytes
+
+Payload Length
+
+uint32
+
+4 bytes
+
+Comprimento do corpo em bytes
+
+Topic Name
+
+[]byte
+
+Variável
+
+Identificador do tópico codificado em UTF-8
+
+Payload
+
+[]byte
+
+Variável
+
+Conteúdo da mensagem ou payload de controle
+
+📂 Estrutura do Projeto
+
 distributed-broker/
 ├── cmd/
 │   ├── broker/                  # Servidor TCP Daemon (main.go)
