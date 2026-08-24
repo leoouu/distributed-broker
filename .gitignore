@@ -1,0 +1,19 @@
+# Binários gerados
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+broker
+cli
+
+# Testes e coverage
+*.out
+*.test
+
+# IDEs e SO
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
