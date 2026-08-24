@@ -2,10 +2,11 @@
 
 Um sistema de mensageria Pub/Sub in-memory de alta performance desenvolvido do zero em Go, projetado para baixa latência, semântica de entrega confiável (At-Least-Once Delivery) e concorrência granular sem frameworks externos ou dependências de terceiros.
 
-🏛️ Arquitetura do Sistema
+## 🏛️ Arquitetura do Sistema
 
-O sistema adota o modelo cliente-servidor com comunicação baseada em sockets TCP puros e um protocolo binário customizado de tamanho de cabeçalho fixo (Wire Protocol).
+O sistema adota o modelo cliente-servidor com comunicação baseada em sockets TCP puros e um protocolo binário customizado de tamanho de cabeçalho fixo (*Wire Protocol*).
 
+```text
       [ Producer ]                   [ Consumer ]
            │                              │
     (TCP)  │ OpPublish             (TCP)  │ OpPoll / OpAck
@@ -102,8 +103,10 @@ Cada frame TCP trafega com um cabeçalho fixo de <b>8 bytes</b> seguido pelo cor
   </tbody>
 </table>
 
-📂 Estrutura do Projeto
+```markdown
+## 📂 Estrutura do Projeto
 
+```text
 distributed-broker/
 ├── cmd/
 │   ├── broker/                  # Servidor TCP Daemon (main.go)
